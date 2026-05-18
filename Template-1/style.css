@@ -12,9 +12,129 @@
 
 html, body{
     height: 100%;
-    width: 1005;
+    width: 100%;
 }
 
+/* ========== CART SIDEBAR ========== */
+.cart-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+.cart-overlay.active{
+    opacity: 1;
+    pointer-events: all;
+}
+.cart-sidebar{
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 400px;
+    height: 100%;
+    background: #fff;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.5s cubic-bezier(0.77, 0, 0.18, 1);
+    box-shadow: -4px 0 30px rgba(0,0,0,0.15);
+}
+.cart-sidebar.active{
+    right: 0;
+}
+.cart-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 1px solid #eee;
+}
+.cart-header h3{
+    font-size: 1.4rem;
+}
+.cart-close{
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.3s;
+}
+.cart-close:hover{
+    transform: rotate(90deg);
+}
+.cart-items{
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 30px;
+}
+.cart-empty{
+    color: #999;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 40px;
+}
+.cart-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.cart-item-info h4{
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+.cart-item-info p{
+    font-size: 0.9rem;
+    color: #666;
+}
+.cart-item-remove{
+    background: none;
+    border: 1px solid #ccc;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: 'ztbro';
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+.cart-item-remove:hover{
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+.cart-footer{
+    padding: 20px 30px;
+    border-top: 1px solid #eee;
+}
+.cart-total{
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+.checkout-btn{
+    width: 100%;
+    padding: 16px;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    font-family: 'ztbro';
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+.checkout-btn:hover{
+    background: #333;
+}
+
+/* ========== PAGE 1 HERO ========== */
 #page1{
     height: 100vh;
     width: 100%;
@@ -41,6 +161,7 @@ html, body{
 .cursor h1{
     color: white;
     font-style: italic;
+    font-size: 1.3vw;
 }
 .page1-content{
     height: 100%;
@@ -64,13 +185,57 @@ nav{
 nav h3{
     font-size: 2vw;
 }
-
-.page1-content h1{
-    font-size: 28vw;
-    line-height: 27vw;
+.nav-right{
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+}
+.cart-toggle{
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+.cart-toggle:hover{
+    opacity: 0.7;
 }
 
+.hero-text{
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.hero-text h1{
+    font-size: 20vw;
+    line-height: 0.9;
+}
+.hero-sub{
+    font-size: 1.6vw;
+    margin-top: 1.5vw;
+    font-weight: 200;
+    letter-spacing: 2px;
+    color: rgba(218,218,218,0.85);
+}
+.shop-now-btn{
+    display: inline-block;
+    margin-top: 2vw;
+    padding: 1vw 3vw;
+    border: 2px solid #fff;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.2vw;
+    letter-spacing: 2px;
+    transition: all 0.4s ease;
+    font-family: 'ztbro';
+}
+.shop-now-btn:hover{
+    background: #fff;
+    color: #000;
+}
+.hero-spacer{
+    height: 3vw;
+}
 
+/* ========== PAGE 2 BRAND STORY ========== */
 #page2{
     height: 100vh;
     width: 100%;
@@ -101,6 +266,7 @@ nav h3{
     line-height: 94%;
 }
 
+/* ========== PAGE 3 PRODUCTS ========== */
 #page3{
     min-height: 100vh;
     width: 100%;
@@ -109,7 +275,6 @@ nav h3{
 }
 .page3-top{
     text-align: center;
-
 }
 .page3-top h4{
     margin-top: 1.5vw;
@@ -140,6 +305,7 @@ nav h3{
     height: 100%;
     width: 32.5%;
     position: relative;
+    overflow: hidden;
 }
 .page3-elem .box video{
     height: 100%;
@@ -154,20 +320,60 @@ nav h3{
     object-fit: cover;
     object-position: center;
     transition: all linear 0.8s;
+    top: 0;
+    left: 0;
 }
 .page3-elem .box:hover img{
     opacity: 0;
 }
-.page3-elem .box h1{
-    margin-top: 90%;
-    margin-left: 10%;
+
+/* Product card overlay */
+.product-info{
     position: absolute;
-    text-align: center;
-    font-size: 100px;
-    z-index: 1;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2vw 1.5vw;
+    z-index: 3;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.product-info h1{
+    position: relative !important;
+    margin: 0 !important;
+    font-size: 2.2vw !important;
     color: white;
     font-weight: 100;
 }
+.product-price{
+    font-size: 1.5vw;
+    color: rgba(255,255,255,0.85);
+    margin: 0.3vw 0 0.8vw;
+}
+.add-to-cart-btn{
+    padding: 0.7vw 2vw;
+    background: transparent;
+    border: 1.5px solid #fff;
+    color: #fff;
+    font-family: 'ztbro';
+    font-size: 1vw;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+.add-to-cart-btn:hover{
+    background: #fff;
+    color: #000;
+}
+.add-to-cart-btn.added{
+    background: #4CAF50;
+    border-color: #4CAF50;
+    color: #fff;
+}
+
+/* ========== PAGE 3-5 PROMO ========== */
 #page3-5{
     min-height: 100vh;
     width: 100%;
@@ -207,6 +413,8 @@ nav h3{
     font-weight: 200;
     text-decoration: underline 3px;
 }
+
+/* ========== PAGE 4 BESTSELLER SPOTLIGHT ========== */
 #page4{
     height: 100vh;
     width: 100%;
@@ -224,14 +432,37 @@ nav h3{
     position:absolute;
     height: 53%;
 }
-#page4 h2{
+.spotlight-content{
     position: absolute;
     text-align: center;
-    font-size: 100px;
     z-index: 1;
     color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.spotlight-content h2{
+    font-size: 100px;
+    line-height: 1;
+}
+.spotlight-name{
+    font-size: 1.6vw;
+    margin-top: 1vw;
+    font-weight: 200;
+    letter-spacing: 2px;
+    opacity: 0.85;
+}
+.spotlight-price{
+    font-size: 2.5vw;
+    margin: 0.8vw 0 1.2vw;
+    font-weight: bold;
+}
+.spotlight-btn{
+    padding: 1vw 3vw !important;
+    font-size: 1.2vw !important;
 }
 
+/* ========== PAGE 5 GALLERY ========== */
 #page5{
     width: 100%;
     height: 100vh;
@@ -254,7 +485,7 @@ nav h3{
 .swiper {
     width: 130%;
     height: 100%;
-  }
+}
 .swiper-slide {
     display: flex;
     justify-content: space-evenly;
@@ -266,6 +497,7 @@ nav h3{
     object-fit: cover;
 }
 
+/* ========== FOOTER ========== */
 #footer{
     width: 100%;
     min-height: 100vh;
@@ -297,6 +529,7 @@ nav h3{
     font-size: 1.5vw;
     font-weight: 100;
     transition: all ease 1s;
+    cursor: pointer;
 }
 #footer .top h3{
     margin-bottom: 3%;
@@ -312,6 +545,7 @@ nav h3{
 }
 #footer .top ul li{
     text-decoration: none;
+    cursor: pointer;
 }
 #footer .top ul li:hover{
     text-decoration: underline;
