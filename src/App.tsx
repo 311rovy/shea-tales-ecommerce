@@ -12,6 +12,7 @@ import Shop from "./pages/Shop";
 import Story from "./pages/Story";
 import Journal from "./pages/Journal";
 import JournalArticle from "./pages/JournalArticle";
+import Admin from "./pages/Admin";
 
 type Toast = { id: number; message: string };
 
@@ -226,6 +227,8 @@ function AppInner() {
     if (path === "/journal") return <Journal />;
     return <Home ctx={sharedContext} />;
   };
+
+  if (path === "/admin") return <Admin />;
 
   return (
     <>
