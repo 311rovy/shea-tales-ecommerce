@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "WebFetch(domain:land-book.com)",
+      "WebFetch(domain:www.aesop.com)",
+      "WebFetch(domain:tatcha.com)",
+      "WebFetch(domain:dieuxskin.com)",
+      "WebFetch(domain:shop.aesop.com)",
+      "WebFetch(domain:www.byredo.com)",
+      "WebFetch(domain:www.loewe.com)",
+      "WebFetch(domain:www.augustinusbader.com)",
+      "WebFetch(domain:www.simonmiller.com)"
+    ]
+  }
+}
