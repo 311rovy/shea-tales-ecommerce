@@ -1,235 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowRight,
-  Check,
-  ChevronDown,
-  Heart,
-  Menu,
-  Minus,
-  Plus,
-  RotateCcw,
-  Search,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Truck,
-  X,
+  ArrowRight, Check, Menu, Minus, Plus,
+  RotateCcw, Search, Share2, ShieldCheck, ShoppingBag,
+  Truck, X,
 } from "lucide-react";
+import { Link, Router, useRouter } from "./router";
+import { menuLinks, products, quizOptions } from "./data";
+import type { AppOutletContext, CartItem, Product } from "./types";
+import Home from "./pages/Home";
+import Shop from "./pages/Shop";
+import Story from "./pages/Story";
+import Journal from "./pages/Journal";
+import JournalArticle from "./pages/JournalArticle";
 
-type Product = {
-  id: string;
-  name: string;
-  shortName: string;
-  step: string;
-  price: number;
-  size: string;
-  skinType: string;
-  scent: string;
-  texture: string;
-  image: string;
-  video: string;
-  story: string;
-  details: string;
-  howToUse: string;
-  ingredients: string[];
-  benefits: string[];
-};
+type Toast = { id: number; message: string };
 
-type CartItem = Product & {
-  quantity: number;
-};
+function AppInner() {
+  const { path, navigate: _navigate } = useRouter();
 
-const products: Product[] = [
-  {
-    id: "shea-soap",
-    name: "Shea Butter Soap",
-    shortName: "Shea Soap",
-    step: "Cleanse",
-    price: 18.99,
-    size: "130g",
-    skinType: "Normal, dry, and sensitive-feeling skin",
-    scent: "Soft cocoa and clean clay",
-    texture: "Creamy bar lather",
-    image: "/Template-1/assets/shea-butter-soap.png",
-    video: "/Template-1/assets/video1.mp4",
-    story: "A creamy cleansing bar made with shea butter and plant-based oils.",
-    details:
-      "The first ritual step. A gentle face, hand, and body bar that lathers softly, rinses clean, and leaves skin comfortable instead of tight.",
-    howToUse: "Massage into wet skin, build a creamy lather, then rinse. Let the bar dry between uses.",
-    ingredients: ["Shea butter", "Olive oil", "Castor oil", "Kaolin clay", "Cocoa pod ash"],
-    benefits: ["Creamy lather", "Plant-based oils", "Low-waste bar", "Comfort cleanse"],
-  },
-  {
-    id: "shea-lotion",
-    name: "Shea Butter Lotion",
-    shortName: "Shea Lotion",
-    step: "Soften",
-    price: 29.99,
-    size: "240ml",
-    skinType: "Daily body care and dry skin",
-    scent: "Warm, clean, barely-there",
-    texture: "Silky lotion",
-    image: "/Template-1/assets/shea-butter-lotion.png",
-    video: "/Template-1/assets/video1.mp4",
-    story: "A silky daily lotion blended with shea butter for soft, lasting moisture.",
-    details:
-      "The everyday layer. Light enough for morning, rich enough for dry evenings, and made for arms, legs, hands, and every spot that needs a soft reset.",
-    howToUse: "Apply after cleansing while skin is slightly damp. Layer more on elbows, knees, and hands.",
-    ingredients: ["Raw shea butter", "Coconut oil", "Aloe leaf", "Vitamin E", "Baobab oil"],
-    benefits: ["Fast-absorbing", "Daily body care", "Comforts dry skin", "Soft satin finish"],
-  },
-  {
-    id: "shea-lip-balm",
-    name: "Shea Butter Lip Balm",
-    shortName: "Lip Balm",
-    step: "Seal",
-    price: 12.99,
-    size: "12g",
-    skinType: "Dry lips and on-the-go comfort",
-    scent: "Natural cocoa butter",
-    texture: "Creamy balm",
-    image: "/Template-1/assets/shea-butter-lip-balm.png",
-    video: "/Template-1/assets/video2.mp4",
-    story: "A creamy shea balm that keeps lips smooth, soft, and comforted.",
-    details:
-      "The pocket ritual. A clean-glide balm with a soft natural finish, built for dry air, long days, and small moments of care.",
-    howToUse: "Swipe onto lips whenever they feel dry. Press a little over cuticles for emergency softness.",
-    ingredients: ["Shea butter", "Beeswax", "Jojoba oil", "Cocoa butter", "Moringa oil"],
-    benefits: ["Pocket ready", "Soft natural finish", "No heavy scent", "Comforting seal"],
-  },
-];
-
-const faqs = [
-  {
-    question: "When will my order ship?",
-    answer: "Orders ship in 2-3 business days. Free shipping applies to orders over $50.",
-  },
-  {
-    question: "Is everything made with real shea butter?",
-    answer: "Yes. Every product is built around shea butter sourced through women-led Ghanaian cooperatives.",
-  },
-  {
-    question: "What is the return policy?",
-    answer: "Unopened products can be returned within 30 days. If something arrives damaged, we make it right.",
-  },
-  {
-    question: "Can I use these on sensitive skin?",
-    answer: "The formulas are intentionally simple and gentle, but patch test first if your skin reacts easily.",
-  },
-];
-
-const ritualSteps = [
-  {
-    title: "Cleanse",
-    copy: "A creamy soap ritual that respects the skin barrier before anything else touches it.",
-    image: "/Template-1/assets/shea-butter-soap.png",
-  },
-  {
-    title: "Soften",
-    copy: "A daily shea lotion for the quiet work of keeping skin comfortable from morning to night.",
-    image: "/Template-1/assets/shea-butter-lotion.png",
-  },
-  {
-    title: "Seal",
-    copy: "A balm for lips, cuticles, and small dry places that ask for care throughout the day.",
-    image: "/Template-1/assets/shea-butter-lip-balm.png",
-  },
-];
-
-const brandValues = [
-  "Raw shea first",
-  "Women-led sourcing",
-  "Skin comfort over trends",
-  "Small-batch restraint",
-];
-
-const galleryImages = [
-  "/Template-1/assets/brand-shea-source.png",
-  "/Template-1/assets/brand-ritual-textures.png",
-  "/Template-1/assets/brand-lifestyle-ritual.png",
-  "/Template-1/assets/shea-butter-lotion.png",
-  "/Template-1/assets/shea-butter-lip-balm.png",
-  "/Template-1/assets/shea-butter-soap.png",
-];
-
-const menuLinks = [
-  {
-    label: "Manifesto",
-    href: "#manifesto",
-    image: "/Template-1/assets/brand-lifestyle-ritual.png",
-    copy: "The emotional world of Shea Tales.",
-  },
-  {
-    label: "Ritual",
-    href: "#ritual",
-    image: "/Template-1/assets/brand-ritual-textures.png",
-    copy: "Cleanse, soften, and seal.",
-  },
-  {
-    label: "Source",
-    href: "#source",
-    image: "/Template-1/assets/brand-shea-source.png",
-    copy: "From Ghanaian shea craft to daily skin care.",
-  },
-  {
-    label: "Shop",
-    href: "#page3",
-    image: "/Template-1/assets/shea-butter-lotion.png",
-    copy: "The core three products.",
-  },
-  {
-    label: "Journal",
-    href: "#journal",
-    image: "/Template-1/assets/shea-butter-soap.png",
-    copy: "Stories, formulas, and rituals.",
-  },
-];
-
-const quizOptions = [
-  {
-    id: "cleanse",
-    label: "I want a softer cleanse",
-    result: "shea-soap",
-  },
-  {
-    id: "dryness",
-    label: "My body skin feels dry",
-    result: "shea-lotion",
-  },
-  {
-    id: "lips",
-    label: "My lips need comfort",
-    result: "shea-lip-balm",
-  },
-  {
-    id: "whole-ritual",
-    label: "I want the whole ritual",
-    result: "bundle",
-  },
-];
-
-const journalPosts = [
-  {
-    title: "Why Raw Shea Feels Different",
-    category: "Ingredient Notes",
-    image: "/Template-1/assets/brand-shea-source.png",
-    copy: "The density, slip, and softness of shea butter begin long before it reaches the jar.",
-  },
-  {
-    title: "The Cleanse / Soften / Seal Method",
-    category: "Ritual",
-    image: "/Template-1/assets/brand-ritual-textures.png",
-    copy: "A three-step body ritual made for real mornings, long days, and dry-skin evenings.",
-  },
-  {
-    title: "From Nut to Butter",
-    category: "Source",
-    image: "/Template-1/assets/brand-lifestyle-ritual.png",
-    copy: "Gather, roast, grind, knead, and finish: the process behind the Shea Tales standard.",
-  },
-];
-
-function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -238,159 +26,278 @@ function App() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [openFaq, setOpenFaq] = useState(0);
-  const [shopFilter, setShopFilter] = useState("All");
   const [activeMenuImage, setActiveMenuImage] = useState(menuLinks[0].image);
   const [quizChoice, setQuizChoice] = useState(quizOptions[0].id);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [emailPopupOpen, setEmailPopupOpen] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [navSolid, setNavSolid] = useState(false);
+  const [openFaq, setOpenFaq] = useState(-1);
+  const [stockMap, setStockMap] = useState<Record<string, number>>({});
+  const [orderError, setOrderError] = useState("");
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderId, setOrderId] = useState<number | null>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const addressRef = useRef<HTMLTextAreaElement>(null);
 
-  const rawShea: Product = {
-    id: "raw-shea-250",
-    name: "Raw Shea Butter 250g",
-    shortName: "Raw Shea",
-    step: "Restore",
-    price: 42,
-    size: "250g",
-    skinType: "Very dry skin, body, and hair",
-    scent: "Naturally nutty",
-    texture: "Dense golden butter",
-    image: "/Template-1/assets/brand-ritual-textures.png",
-    video: "/Template-1/assets/841b3aa6ab3247b89c067144fcd7f099.webm",
-    story: "Unrefined shea butter made by women-led cooperatives in Ghana.",
-    details: "A dense, golden butter for deep body moisture, protective styling, and overnight skin care.",
-    howToUse: "Warm a pea-sized amount between palms, press into dry skin, or melt through hair ends.",
-    ingredients: ["Unrefined shea butter"],
-    benefits: ["Single ingredient", "Deep moisture", "Traditional craft", "Multi-use"],
-  };
-
-  const filteredProducts = shopFilter === "All"
-    ? products
-    : products.filter((product) => product.step === shopFilter);
-  const selectedQuiz = quizOptions.find((option) => option.id === quizChoice) ?? quizOptions[0];
-  const quizProduct = products.find((product) => product.id === selectedQuiz.result);
-
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = useMemo(
-    () => cart.reduce((sum, item) => sum + item.quantity * item.price, 0),
-    [cart],
-  );
-  const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 6.95;
-  const total = subtotal + shipping;
+  const isHome = path === "/";
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-          }
-        });
-      },
-      { threshold: 0.18 },
-    );
+    if (!isHome) { setNavSolid(true); return; }
+    const onScroll = () => setNavSolid(window.scrollY > 72);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
 
-    document.querySelectorAll(".reveal, .line-reveal, .stagger").forEach((element) => observer.observe(element));
-
-    const onMove = (event: MouseEvent) => {
-      document.documentElement.style.setProperty("--cursor-x", `${event.clientX}px`);
-      document.documentElement.style.setProperty("--cursor-y", `${event.clientY}px`);
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      document.documentElement.style.setProperty("--cursor-x", `${e.clientX}px`);
+      document.documentElement.style.setProperty("--cursor-y", `${e.clientY}px`);
     };
     window.addEventListener("mousemove", onMove);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("mousemove", onMove);
-    };
+    return () => window.removeEventListener("mousemove", onMove);
   }, []);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem("shea-email-popup");
+    if (dismissed) return;
+    const timer = setTimeout(() => setEmailPopupOpen(true), 9000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then((r) => r.json())
+      .then((rows: { id: string; stock_qty: number }[]) => {
+        const map: Record<string, number> = {};
+        rows.forEach((r) => { map[r.id] = r.stock_qty; });
+        setStockMap(map);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("in-view"); }),
+        { threshold: 0.15 }
+      );
+      document.querySelectorAll(".reveal, .line-reveal, .stagger").forEach((el) => observer.observe(el));
+      return () => observer.disconnect();
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [path]);
+
+  const pushToast = (message: string) => {
+    const id = Date.now();
+    setToasts((t) => [...t, { id, message }]);
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
+  };
 
   const addToCart = (product: Product) => {
     setOrderPlaced(false);
     setCart((current) => {
       const existing = current.find((item) => item.id === product.id);
-
-      if (existing) {
-        return current.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
-        );
-      }
-
+      if (existing) return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
       return [...current, { ...product, quantity: 1 }];
     });
     setCartOpen(true);
+    pushToast(`${product.shortName} added to bag`);
   };
 
-  const addBundle = () => {
-    products.forEach((product) => addToCart(product));
-  };
+  const addBundle = () => products.forEach((p) => addToCart(p));
 
   const updateQuantity = (productId: string, quantity: number) => {
-    setCart((current) => {
-      if (quantity < 1) {
-        return current.filter((item) => item.id !== productId);
-      }
-
-      return current.map((item) =>
-        item.id === productId ? { ...item, quantity } : item,
-      );
-    });
+    setCart((current) =>
+      quantity < 1
+        ? current.filter((item) => item.id !== productId)
+        : current.map((item) => item.id === productId ? { ...item, quantity } : item)
+    );
   };
 
   const toggleWishlist = (productId: string) => {
+    const isAdding = !wishlist.includes(productId);
     setWishlist((current) =>
-      current.includes(productId)
-        ? current.filter((id) => id !== productId)
-        : [...current, productId],
+      isAdding ? [...current, productId] : current.filter((id) => id !== productId)
     );
+    pushToast(isAdding ? "Saved to wishlist" : "Removed from wishlist");
   };
 
   const openCheckout = () => {
     if (cart.length === 0) return;
     setCartOpen(false);
+    setOrderPlaced(false);
+    setOrderError("");
+    setOrderId(null);
     setCheckoutOpen(true);
   };
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     if (cart.length === 0) return;
-    setOrderPlaced(true);
-    setCart([]);
+    const email = emailRef.current?.value.trim() ?? "";
+    const name = nameRef.current?.value.trim() ?? "";
+    const address = addressRef.current?.value.trim() ?? "";
+    if (!email || !name) {
+      setOrderError("Please fill in your email and name.");
+      return;
+    }
+    setOrderError("");
+    setOrderLoading(true);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          name,
+          address,
+          cart: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.quantity })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setOrderError(data.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      setOrderId(data.orderId);
+      setOrderPlaced(true);
+      setCart([]);
+      pushToast("Order confirmed — thank you!");
+      fetch("/api/products")
+        .then((r) => r.json())
+        .then((rows: { id: string; stock_qty: number }[]) => {
+          const map: Record<string, number> = {};
+          rows.forEach((r) => { map[r.id] = r.stock_qty; });
+          setStockMap(map);
+        })
+        .catch(() => {});
+    } catch {
+      setOrderError("Connection error. Please try again.");
+    } finally {
+      setOrderLoading(false);
+    }
+  };
+
+  const handleShare = async (product: Product) => {
+    const url = `${window.location.origin}/shop`;
+    if (navigator.share) {
+      try { await navigator.share({ title: product.name, text: product.story, url }); } catch { /* user cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      pushToast("Link copied to clipboard");
+    }
+  };
+
+  const dismissEmailPopup = () => {
+    setEmailPopupOpen(false);
+    localStorage.setItem("shea-email-popup", Date.now().toString());
+  };
+
+  const submitEmail = () => {
+    if (!emailValue.includes("@")) { pushToast("Please enter a valid email"); return; }
+    setEmailSubmitted(true);
+    pushToast("Welcome to the Softness List");
+    setTimeout(() => { dismissEmailPopup(); setEmailSubmitted(false); setEmailValue(""); }, 3200);
+  };
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.quantity * item.price, 0), [cart]);
+  const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 6.95;
+  const total = subtotal + shipping;
+
+  const selectedQuiz = quizOptions.find((o) => o.id === quizChoice) ?? quizOptions[0];
+  const quizProduct = products.find((p) => p.id === selectedQuiz.result);
+
+  const overlayActive = cartOpen || checkoutOpen || quizOpen || !!selectedProduct;
+
+  const sharedContext: AppOutletContext = {
+    addToCart, addBundle, toggleWishlist, setSelectedProduct,
+    setQuizOpen, wishlist, pushToast, stockMap,
+  };
+
+  const renderPage = () => {
+    if (path === "/") return <Home ctx={sharedContext} />;
+    if (path === "/shop") return <Shop ctx={sharedContext} openFaq={openFaq} setOpenFaq={setOpenFaq} />;
+    if (path === "/story") return <Story ctx={sharedContext} openFaq={openFaq} setOpenFaq={setOpenFaq} />;
+    if (path.startsWith("/journal/")) return <JournalArticle slug={path.replace("/journal/", "")} ctx={sharedContext} />;
+    if (path === "/journal") return <Journal />;
+    return <Home ctx={sharedContext} />;
   };
 
   return (
     <>
-      <div className="cursor">
-        <h1>Feel</h1>
+      <div className="cursor"><h1>Feel</h1></div>
+
+      {/* Toast notifications */}
+      <div className="toast-stack" aria-live="polite">
+        {toasts.map((t) => (
+          <div className="toast" key={t.id}><Check size={15} /> {t.message}</div>
+        ))}
       </div>
 
+      {/* Email capture popup */}
+      {emailPopupOpen && (
+        <div className="email-popup-overlay" onClick={dismissEmailPopup}>
+          <div className="email-popup" onClick={(e) => e.stopPropagation()}>
+            <button className="email-popup-close" onClick={dismissEmailPopup} aria-label="Close"><X size={20} /></button>
+            {emailSubmitted ? (
+              <div className="email-popup-success">
+                <Check size={32} />
+                <h3>You're in.</h3>
+                <p>Use code <strong>SHEA10</strong> at checkout for 10% off your first order.</p>
+              </div>
+            ) : (
+              <>
+                <p className="eyebrow">Welcome gift</p>
+                <h2>10% off your first order.</h2>
+                <p>Join The Softness List for restocks, rituals, and small-batch drops.</p>
+                <div className="email-popup-form">
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={emailValue}
+                    onChange={(e) => setEmailValue(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && submitEmail()}
+                    aria-label="Email address"
+                  />
+                  <button onClick={submitEmail}>Claim offer</button>
+                </div>
+                <button className="email-popup-skip" onClick={dismissEmailPopup}>No thanks</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Overlay backdrop */}
       <div
-        className={`cart-overlay ${cartOpen || checkoutOpen || quizOpen || selectedProduct ? "active" : ""}`}
-        onClick={() => {
-          setCartOpen(false);
-          setCheckoutOpen(false);
-          setQuizOpen(false);
-          setSelectedProduct(null);
-        }}
+        className={`cart-overlay ${overlayActive ? "active" : ""}`}
+        onClick={() => { setCartOpen(false); setCheckoutOpen(false); setQuizOpen(false); setSelectedProduct(null); }}
       />
 
+      {/* Cinematic fullscreen menu */}
       <aside className={`cinematic-menu ${menuOpen ? "active" : ""}`} aria-label="Fullscreen menu">
         <img src={activeMenuImage} alt="" />
         <div className="menu-scrim" />
         <div className="cinematic-top">
-          <a href="#page1" onClick={() => setMenuOpen(false)}>Shea Tales</a>
-          <button onClick={() => setMenuOpen(false)} aria-label="Close menu">
-            <X size={30} />
-          </button>
+          <Link to="/" onClick={() => setMenuOpen(false)} className="cinematic-brand">Shea Tales</Link>
+          <button onClick={() => setMenuOpen(false)} aria-label="Close menu"><X size={30} /></button>
         </div>
         <div className="cinematic-links">
           {menuLinks.map((link, index) => (
-            <a
-              href={link.href}
-              key={link.label}
-              onClick={() => setMenuOpen(false)}
-              onMouseEnter={() => setActiveMenuImage(link.image)}
-            >
-              <span>0{index + 1}</span>
-              {link.label}
+            <Link to={link.href} key={link.label} onClick={() => setMenuOpen(false)} className="cinematic-link">
+              <em>0{index + 1}</em>
+              <span
+                className="cinematic-link-label"
+                onMouseEnter={() => setActiveMenuImage(link.image)}
+              >
+                {link.label}
+              </span>
               <small>{link.copy}</small>
-            </a>
+            </Link>
           ))}
         </div>
         <button className="menu-quiz" onClick={() => { setMenuOpen(false); setQuizOpen(true); }}>
@@ -398,14 +305,12 @@ function App() {
         </button>
       </aside>
 
+      {/* Cart sidebar */}
       <aside className={`cart-sidebar ${cartOpen ? "active" : ""}`} aria-label="Shopping cart">
         <div className="cart-header">
           <h3>Your Ritual</h3>
-          <button className="cart-close" onClick={() => setCartOpen(false)} aria-label="Close cart">
-            <X size={28} />
-          </button>
+          <button className="cart-close" onClick={() => setCartOpen(false)} aria-label="Close cart"><X size={28} /></button>
         </div>
-
         <div className="cart-items">
           {cart.length === 0 ? (
             <p className="cart-empty">Your ritual bag is empty</p>
@@ -415,53 +320,37 @@ function App() {
                 <img src={item.image} alt={item.name} />
                 <div className="cart-item-info">
                   <h4>{item.name}</h4>
-                  <p>
-                    ${item.price.toFixed(2)} / {item.size}
-                  </p>
+                  <p>${item.price.toFixed(2)} / {item.size}</p>
                   <div className="qty">
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity">
-                      <Minus size={14} />
-                    </button>
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity"><Minus size={14} /></button>
                     <span>{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity">
-                      <Plus size={14} />
-                    </button>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity"><Plus size={14} /></button>
                   </div>
                 </div>
               </div>
             ))
           )}
         </div>
-
         <div className="cart-footer">
           <label className="discount-field">
             Ritual code
-            <input type="text" placeholder="Enter code" />
+            <input type="text" placeholder="e.g. SHEA10" />
           </label>
-          <div className="cart-line">
-            <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
-          </div>
-          <div className="cart-line">
-            <span>Shipping</span>
-            <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
-          </div>
-          <div className="cart-total">
-            <span>Total</span>
-            <span>${total.toFixed(2)}</span>
-          </div>
-          <button className="checkout-btn" disabled={cart.length === 0} onClick={openCheckout}>
-            Checkout
-          </button>
+          <div className="cart-line"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+          <div className="cart-line"><span>Shipping</span><span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span></div>
+          {subtotal > 0 && subtotal < 50 && (
+            <p className="shipping-nudge">Add ${(50 - subtotal).toFixed(2)} more for free shipping</p>
+          )}
+          <div className="cart-total"><span>Total</span><span>${total.toFixed(2)}</span></div>
+          <button className="checkout-btn" disabled={cart.length === 0} onClick={openCheckout}>Checkout</button>
         </div>
       </aside>
 
+      {/* Product detail drawer */}
       <aside className={`product-drawer ${selectedProduct ? "active" : ""}`} aria-label="Product details">
         {selectedProduct && (
           <>
-            <button className="drawer-close" onClick={() => setSelectedProduct(null)} aria-label="Close product details">
-              <X size={28} />
-            </button>
+            <button className="drawer-close" onClick={() => setSelectedProduct(null)} aria-label="Close"><X size={28} /></button>
             <div className="drawer-media">
               <img src={selectedProduct.image} alt={selectedProduct.name} />
               <video autoPlay muted loop playsInline src={selectedProduct.video} />
@@ -483,94 +372,69 @@ function App() {
                 </div>
                 <div>
                   <h4>Benefits</h4>
-                  {selectedProduct.benefits.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
+                  {selectedProduct.benefits.map((b) => <span key={b}>{b}</span>)}
                 </div>
                 <div>
                   <h4>Ingredients</h4>
-                  {selectedProduct.ingredients.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
+                  {selectedProduct.ingredients.map((i) => <span key={i}>{i}</span>)}
                 </div>
               </div>
-              <button onClick={() => addToCart(selectedProduct)}>Add to Ritual Bag</button>
+              <div className="drawer-actions">
+                <button onClick={() => { addToCart(selectedProduct); setSelectedProduct(null); }}>Add to Ritual Bag</button>
+                <button className="share-btn" onClick={() => handleShare(selectedProduct)} aria-label="Share product">
+                  <Share2 size={16} /> Share
+                </button>
+              </div>
             </div>
           </>
         )}
       </aside>
 
+      {/* Checkout panel */}
       <aside className={`checkout-panel ${checkoutOpen ? "active" : ""}`} aria-label="Checkout">
         <div className="cart-header">
           <h3>{orderPlaced ? "Confirmed" : "Checkout"}</h3>
-          <button className="cart-close" onClick={() => setCheckoutOpen(false)} aria-label="Close checkout">
-            <X size={28} />
-          </button>
+          <button className="cart-close" onClick={() => { setCheckoutOpen(false); setOrderError(""); }} aria-label="Close checkout"><X size={28} /></button>
         </div>
         {orderPlaced ? (
           <div className="confirmation">
             <Check size={38} />
             <h2>Your ritual is on the way.</h2>
-            <p>Confirmation ST-1027 has been created. You will receive tracking once your order leaves the studio.</p>
-            <button type="button" className="checkout-btn" onClick={() => setCheckoutOpen(false)}>
-              Keep Browsing
-            </button>
+            <p>Order #{orderId} confirmed. You will receive tracking once your order leaves the studio.</p>
+            <button type="button" className="checkout-btn" onClick={() => { setCheckoutOpen(false); setOrderId(null); }}>Keep Browsing</button>
           </div>
         ) : (
-          <form className="checkout-form">
-            <div className="checkout-steps">
-              <span>Contact</span>
-              <span>Delivery</span>
-              <span>Payment</span>
-            </div>
-            <label>
-              Email
-              <input type="email" placeholder="you@example.com" />
-            </label>
-            <label>
-              Full name
-              <input type="text" placeholder="Your name" />
-            </label>
-            <label>
-              Shipping address
-              <textarea placeholder="Street, city, region, country" />
-            </label>
-            <label>
-              Payment
-              <input type="text" placeholder="Card number" />
-            </label>
+          <form className="checkout-form" onSubmit={(e) => e.preventDefault()}>
+            <div className="checkout-steps"><span>Contact</span><span>Delivery</span><span>Payment</span></div>
+            <label>Email<input ref={emailRef} type="email" placeholder="you@example.com" required /></label>
+            <label>Full name<input ref={nameRef} type="text" placeholder="Your name" required /></label>
+            <label>Shipping address<textarea ref={addressRef} placeholder="Street, city, region, country" /></label>
+            <label>Card number<input type="text" placeholder="&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull;" maxLength={19} /></label>
+            {orderError && <p style={{ color: "#c0392b", fontSize: "0.82rem", margin: "0.25rem 0" }}>{orderError}</p>}
             <div className="trust-row">
               <span><Truck size={18} /> 2-3 day processing</span>
               <span><ShieldCheck size={18} /> Secure checkout</span>
             </div>
-            <div className="cart-total">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-            <button type="button" className="checkout-btn" onClick={placeOrder}>
-              Place Order
+            <div className="cart-total"><span>Total</span><span>${total.toFixed(2)}</span></div>
+            <button type="button" className="checkout-btn" onClick={placeOrder} disabled={orderLoading}>
+              {orderLoading ? "Placing order…" : "Place Order"}
             </button>
           </form>
         )}
       </aside>
 
+      {/* Quiz drawer */}
       <aside className={`quiz-drawer ${quizOpen ? "active" : ""}`} aria-label="Ritual quiz">
         <div className="cart-header">
           <h3>Find Your Ritual</h3>
-          <button className="cart-close" onClick={() => setQuizOpen(false)} aria-label="Close ritual quiz">
-            <X size={28} />
-          </button>
+          <button className="cart-close" onClick={() => setQuizOpen(false)} aria-label="Close quiz"><X size={28} /></button>
         </div>
         <div className="quiz-body">
           <p className="eyebrow">Skin Check</p>
           <h2>What is your skin asking for today?</h2>
           <div className="quiz-options">
             {quizOptions.map((option) => (
-              <button
-                className={quizChoice === option.id ? "active" : ""}
-                onClick={() => setQuizChoice(option.id)}
-                key={option.id}
-              >
+              <button className={quizChoice === option.id ? "active" : ""} onClick={() => setQuizChoice(option.id)} key={option.id}>
                 {option.label}
               </button>
             ))}
@@ -578,12 +442,12 @@ function App() {
           <div className="quiz-result">
             {selectedQuiz.result === "bundle" ? (
               <>
-                <img src="/Template-1/assets/brand-ritual-textures.png" alt="Complete Shea Tales ritual" />
+                <img src="/Template-1/assets/brand-ritual-textures.png" alt="Complete ritual" />
                 <div>
                   <span>Recommended</span>
                   <h3>Complete Ritual Set</h3>
                   <p>Soap, lotion, and lip balm together: the full Cleanse / Soften / Seal system.</p>
-                  <button onClick={addBundle}>Add Complete Ritual</button>
+                  <button onClick={() => { addBundle(); setQuizOpen(false); }}>Add Complete Ritual</button>
                 </div>
               </>
             ) : quizProduct ? (
@@ -593,7 +457,7 @@ function App() {
                   <span>Recommended</span>
                   <h3>{quizProduct.name}</h3>
                   <p>{quizProduct.details}</p>
-                  <button onClick={() => addToCart(quizProduct)}>Add to Bag</button>
+                  <button onClick={() => { addToCart(quizProduct); setQuizOpen(false); }}>Add to Bag</button>
                 </div>
               </>
             ) : null}
@@ -601,354 +465,103 @@ function App() {
         </div>
       </aside>
 
-      <main className="main">
-        <section id="page1">
-          <video autoPlay loop muted playsInline src="/Template-1/assets/head.mp4" />
-          <div className="page1-content">
-            <nav>
-              <a href="#page1" className="brand">Shea Tales</a>
-              <div className="nav-links" aria-label="Primary navigation">
-                <button onClick={() => setMenuOpen(true)}>
-                  <Menu size={18} /> Menu
-                </button>
-                <a href="#ritual">Ritual</a>
-                <a href="#page3">Shop</a>
-                <button onClick={() => setQuizOpen(true)}>Quiz</button>
-              </div>
-              <button className="cart-toggle" onClick={() => setCartOpen(true)}>
-                <ShoppingBag size={22} /> Bag ({cartCount})
-              </button>
-            </nav>
+      {/* Fixed nav */}
+      <nav className={`app-nav ${navSolid ? "nav-solid" : "nav-transparent"}`}>
+        <Link to="/" className="brand">
+          <img src="/Template-1/assets/Logosheatales.jpeg" alt="Shea Tales logo" className="logo-img" />
+          Shea Tales
+        </Link>
+        <div className="nav-links" aria-label="Primary navigation">
+          <button onClick={() => setMenuOpen(true)} className="nav-menu-btn"><Menu size={17} /> Menu</button>
+          <Link to="/shop"    className={path === "/shop"    ? "nav-active" : ""}>Shop</Link>
+          <Link to="/story"   className={path === "/story"   ? "nav-active" : ""}>Story</Link>
+          <Link to="/journal" className={path.startsWith("/journal") ? "nav-active" : ""}>Journal</Link>
+          <button onClick={() => setQuizOpen(true)} className="nav-quiz-btn">Find My Ritual</button>
+        </div>
+        <button className="cart-toggle" onClick={() => setCartOpen(true)}>
+          <ShoppingBag size={20} />
+          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+        </button>
+      </nav>
 
-            <div className="hero-text reveal">
-              <span>Ghanaian shea butter skincare</span>
-              <h1>Shea Tales</h1>
-              <p>Daily skin rituals shaped by craft, comfort, and raw golden butter.</p>
-              <a href="#ritual">
-                Enter the Ritual <ArrowRight size={18} />
-              </a>
-            </div>
-            <div className="hero-spacer" />
-          </div>
-        </section>
+      {/* Page content */}
+      <main className="main">{renderPage()}</main>
 
-        <section id="manifesto">
-          <div className="manifesto-grid">
-            <div className="manifesto-copy reveal">
-              <p className="eyebrow">Brand Manifesto</p>
-              <h2>Not clean beauty as a trend. Care as a memory.</h2>
-            </div>
-            <div className="manifesto-media reveal">
-              <img src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Morning shea butter skincare ritual" />
-            </div>
-          </div>
-          <div className="manifesto-lines">
-            {[
-              "Shea Tales begins with the butter.",
-              "A raw, golden ingredient with a long memory.",
-              "Made by hands that know patience.",
-              "Used by skin that asks for softness.",
-            ].map((line) => (
-              <h1 className="line-reveal" key={line}>{line}</h1>
-            ))}
-          </div>
-        </section>
-
-        <section id="ritual" className="ritual-section">
-          <div className="ritual-head reveal">
-            <p className="eyebrow">The Ritual</p>
-            <h2>Cleanse. Soften. Seal.</h2>
-            <p>
-              Three everyday products, one complete shea routine. Start with comfort,
-              keep the formula simple, and let the texture do the talking.
-            </p>
-            <button onClick={addBundle}>Add Complete Ritual - $61.97</button>
-          </div>
-          <div className="ritual-stage">
-            {ritualSteps.map((step, index) => (
-              <article className="ritual-card stagger" style={{ transitionDelay: `${index * 120}ms` }} key={step.title}>
-                <img src={step.image} alt={`${step.title} ritual`} />
-                <span>0{index + 1}</span>
-                <h3>{step.title}</h3>
-                <p>{step.copy}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="source" className="source-section">
-          <div className="source-media reveal">
-            <img src="/Template-1/assets/brand-shea-source.png" alt="Hands working with raw shea butter" />
-            <video autoPlay loop muted playsInline src="/Template-1/assets/video2.mp4" />
-          </div>
-          <div className="source-copy reveal">
-            <p className="eyebrow">From Ghana, With Care</p>
-            <h2>The shea is not an ingredient note. It is the origin.</h2>
-            <p>
-              Our formulas are shaped around raw shea butter sourced through women-led
-              cooperatives. The site can sell a product, but the brand has to honor
-              the process behind it: gathered, roasted, kneaded, and finished with restraint.
-            </p>
-            <div className="value-grid">
-              {brandValues.map((value) => (
-                <span key={value}>{value}</span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="page3">
-          <div className="page3-top reveal">
-            <h4>
-              Shop the Ritual <span>Core Three</span>
-            </h4>
-            <h2>Products with a</h2>
-            <h2>Point of View</h2>
+      {/* Footer */}
+      <footer id="footer">
+        <div className="footer-top">
+          <div className="footer-brand">
+            <img src="/Template-1/assets/Logosheatales.jpeg" alt="Shea Tales logo" className="footer-logo" />
+            <p className="footer-tagline">Daily skin rituals shaped<br />by Ghanaian shea butter.</p>
+            <form className="footer-newsletter-form" onSubmit={(e) => e.preventDefault()}>
+              <input type="email" placeholder="Join the ritual drop..." aria-label="Email for newsletter" />
+              <button type="submit">&#8594;</button>
+            </form>
+            <p className="footer-newsletter-note">Restocks, small-batch drops, ritual notes.</p>
           </div>
 
-          <div className="shop-tools reveal" aria-label="Shop tools">
-            <div className="search-pill">
-              <Search size={18} />
-              <span>Search shea rituals</span>
-            </div>
-            {["All", "Cleanse", "Soften", "Seal"].map((filter) => (
-              <button
-                className={shopFilter === filter ? "active" : ""}
-                onClick={() => setShopFilter(filter)}
-                key={filter}
-              >
-                {filter}
-              </button>
-            ))}
+          <div className="footer-col">
+            <h4>Navigate</h4>
+            <ul>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/shop">Shop</Link></li>
+              <li><Link to="/story">Our Story</Link></li>
+              <li><Link to="/journal">Journal</Link></li>
+            </ul>
           </div>
 
-          <div className="page3-elem">
-            {filteredProducts.map((product) => (
-              <article className="box product-card reveal" key={product.id}>
-                <button
-                  className={`wishlist ${wishlist.includes(product.id) ? "active" : ""}`}
-                  onClick={() => toggleWishlist(product.id)}
-                  aria-label={`Save ${product.name}`}
-                >
-                  <Heart size={20} />
-                </button>
-                <div className="product-info">
-                  <span>{product.step}</span>
-                  <h1>{product.shortName}</h1>
-                  <p className="product-story">{product.story}</p>
-                  <p className="product-price">${product.price.toFixed(2)}</p>
-                  <div className="product-actions">
-                    <button onClick={() => addToCart(product)}>Add to Bag</button>
-                    <button onClick={() => setSelectedProduct(product)}>View Ritual</button>
-                  </div>
-                </div>
-                <img src={product.image} alt={product.name} />
-                <video autoPlay loop muted playsInline preload="metadata" src={product.video} />
-              </article>
-            ))}
+          <div className="footer-col">
+            <h4>Products</h4>
+            <ul>
+              <li><Link to="/shop">Shea Butter Soap</Link></li>
+              <li><Link to="/shop">Body Lotion</Link></li>
+              <li><Link to="/shop">Lip Balm</Link></li>
+              <li><Link to="/shop">Raw Shea Butter</Link></li>
+              <li><Link to="/shop">Complete Ritual Set</Link></li>
+            </ul>
           </div>
-        </section>
 
-        <section className="texture-section">
-          <div className="texture-copy reveal">
-            <p className="eyebrow">Texture Study</p>
-            <h2>Butter, balm, lather, lotion.</h2>
-            <p>
-              The brand presence lives in the material details: the gloss of balm,
-              the density of raw shea, the soft drag of lotion, and the creamy bar lather.
-            </p>
+          <div className="footer-col">
+            <h4>Connect</h4>
+            <ul>
+              <li><a href="https://instagram.com/sheatales" target="_blank" rel="noopener noreferrer">Instagram &#8599;</a></li>
+              <li><a href="https://tiktok.com/@sheatales" target="_blank" rel="noopener noreferrer">TikTok &#8599;</a></li>
+              <li><a href="mailto:hello@sheatales.com">hello@sheatales.com</a></li>
+              <li><a href="mailto:wholesale@sheatales.com">Wholesale enquiries</a></li>
+            </ul>
+            <h4 className="footer-col-second-head">Help</h4>
+            <ul>
+              <li><Link to="/story">FAQ</Link></li>
+              <li><Link to="/story">Shipping info</Link></li>
+            </ul>
           </div>
-          <div className="texture-media reveal">
-            <img src="/Template-1/assets/brand-ritual-textures.png" alt="Shea butter textures and ritual products" />
-          </div>
-        </section>
+        </div>
 
-        <section id="page3-5">
-          <div className="border" />
-          <div className="elements">
-            {[
-              "Free shipping on all orders over $50.",
-              "Raw shea butter leads every formula.",
-              "Ethically sourced through women-led craft.",
-              "No parabens. No sulfates. No noise.",
-              "Small rituals, made for daily skin.",
-              "This is Shea Tales.",
-            ].map((line) => (
-              <h1 className="line-reveal" key={line}>{line}</h1>
-            ))}
-          </div>
-          <div className="head reveal">
-            <h1>Limited Edition</h1>
-            <h1>Market Basket Gift Sets</h1>
-          </div>
-        </section>
+        <div className="footer-divider" />
 
-        <section id="about" className="about-section">
-          <div className="about-media reveal">
-            <video autoPlay loop muted playsInline src="/Template-1/assets/video1.mp4" />
-          </div>
-          <div className="about-copy reveal">
-            <p className="eyebrow">The Shea Standard</p>
-            <h2>Built around the butter, not the bottle.</h2>
-            <p>
-              Shea Tales keeps formulas focused, packaging quiet, and sourcing direct.
-              Each product begins with raw shea butter and ends with skin that feels cared for.
-            </p>
-            <div className="stat-row">
-              <span><strong>3</strong> Core ritual steps</span>
-              <span><strong>0</strong> Sulfates or parabens</span>
-              <span><strong>50+</strong> Free shipping</span>
-            </div>
-          </div>
-        </section>
+        <div className="bottom" aria-label="Shea Tales">
+          {"Shea Tales".split("").map((letter, index) => (
+            <h1 key={`${letter}-${index}`}>{letter === " " ? " " : letter}</h1>
+          ))}
+        </div>
 
-        <section id="page4">
-          <video autoPlay muted loop playsInline src="/Template-1/assets/841b3aa6ab3247b89c067144fcd7f099.webm" />
-          <div className="spotlight-content reveal">
-            <h2>Raw Shea</h2>
-            <p>The origin product - 250g</p>
-            <strong>$42.00</strong>
-            <button onClick={() => addToCart(rawShea)}>Add to Bag</button>
-          </div>
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-        </section>
-
-        <section className="reviews-section">
-          <div className="review-card reveal">
-            <Sparkles size={28} />
-            <p>"It feels like a brand with a real story, not just another body care line."</p>
-            <span>Amara K. / verified order</span>
-          </div>
-          <div className="review-card reveal">
-            <Sparkles size={28} />
-            <p>"The ritual makes sense. Soap, lotion, balm. Nothing extra, everything useful."</p>
-            <span>Nia B. / complete ritual set</span>
-          </div>
-          <div className="review-card reveal">
-            <Sparkles size={28} />
-            <p>"The textures are beautiful, and the sourcing story makes the products feel grounded."</p>
-            <span>Lena T. / raw shea customer</span>
-          </div>
-        </section>
-
-        <section className="care-section">
-          <article className="care-card reveal">
-            <Truck size={26} />
-            <h3>Shipping</h3>
-            <p>Orders leave in 2-3 business days. Shipping is free when the bag reaches $50.</p>
-          </article>
-          <article className="care-card reveal">
-            <RotateCcw size={26} />
-            <h3>Returns</h3>
-            <p>Unopened products can return within 30 days. Damaged arrivals are replaced.</p>
-          </article>
-          <article className="care-card reveal">
-            <ShieldCheck size={26} />
-            <h3>Skin promise</h3>
-            <p>Short ingredient lists, no sulfates, no parabens, and patch-test friendly guidance.</p>
-          </article>
-        </section>
-
-        <section id="faq" className="faq-section">
-          <div className="faq-title reveal">
-            <p className="eyebrow">Care Notes</p>
-            <h2>Shipping, sourcing, skin.</h2>
-          </div>
-          <div className="faq-list reveal">
-            {faqs.map((faq, index) => (
-              <button
-                className={`faq-item ${openFaq === index ? "active" : ""}`}
-                key={faq.question}
-                onClick={() => setOpenFaq(openFaq === index ? -1 : index)}
-              >
-                <span>
-                  {faq.question}
-                  <ChevronDown size={22} />
-                </span>
-                <p>{faq.answer}</p>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section id="page5">
-          <h1 className="reveal">Stories in Skin.</h1>
-          <div className="swipper">
-            <div className="swiper-slide">
-              {[...galleryImages, ...galleryImages].map((image, index) => (
-                <img src={image} alt="Shea Tales brand and product story" key={`${image}-${index}`} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="journal" className="journal-section">
-          <div className="journal-head reveal">
-            <p className="eyebrow">Shea Journal</p>
-            <h2>Notes from the ritual.</h2>
-          </div>
-          <div className="journal-grid">
-            {journalPosts.map((post, index) => (
-              <article className="journal-card stagger" style={{ transitionDelay: `${index * 110}ms` }} key={post.title}>
-                <img src={post.image} alt={post.title} />
-                <div>
-                  <span>{post.category}</span>
-                  <h3>{post.title}</h3>
-                  <p>{post.copy}</p>
-                  <a href="#contact">Read Note <ArrowRight size={16} /></a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="contact" className="contact-section">
-          <div className="contact-copy reveal">
-            <p className="eyebrow">The Softness List</p>
-            <h2>Restocks, rituals, and small-batch drops.</h2>
-          </div>
-          <form className="newsletter reveal">
-            <input type="email" placeholder="Email address" aria-label="Email address" />
-            <button type="button">
-              Join <Check size={18} />
-            </button>
-          </form>
-        </section>
-
-        <footer id="footer">
-          <div className="top">
-            <div className="box1">
-              <h3>Daily skin rituals shaped by Ghanaian shea butter.</h3>
-              <a href="#page3">Shop the Ritual</a>
-            </div>
-            <div className="box2">
-              <ul>
-                <li><a href="#manifesto">Manifesto</a></li>
-                <li><a href="#ritual">Ritual</a></li>
-                <li><a href="#source">Source</a></li>
-                <li><a href="#journal">Journal</a></li>
-                <li><a href="#faq">Care</a></li>
-                <li><a href="#contact">Contact</a></li>
-              </ul>
-            </div>
-            <div className="box3">
-              <ul>
-                <li>Instagram -</li>
-                <li>TikTok -</li>
-                <li>Wholesale -</li>
-              </ul>
-            </div>
-          </div>
-          <div className="bottom" aria-label="Shea Tales">
-            {"Shea Tales".split("").map((letter, index) => (
-              <h1 key={`${letter}-${index}`}>{letter === " " ? "\u00A0" : letter}</h1>
-            ))}
-          </div>
-        </footer>
-      </main>
+        <div className="footer-legal">
+          <span>&copy; 2026 Shea Tales. All rights reserved.</span>
+          <span className="footer-legal-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms</a>
+            <a href="#">Accessibility</a>
+          </span>
+        </div>
+      </footer>
     </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <AppInner />
+    </Router>
+  );
+}
