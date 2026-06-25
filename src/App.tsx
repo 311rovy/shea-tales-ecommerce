@@ -12,8 +12,16 @@ import Shop from "./pages/Shop";
 import Story from "./pages/Story";
 import Journal from "./pages/Journal";
 import JournalArticle from "./pages/JournalArticle";
+import Shipping from "./pages/Shipping";
+import Returns from "./pages/Returns";
+import Care from "./pages/Care";
+import OrderTracking from "./pages/OrderTracking";
 import Admin from "./pages/Admin";
 import Picture from "./components/Picture";
+import WhatsAppButton from "./components/WhatsAppButton";
+import CookieBanner from "./components/CookieBanner";
+import SEO from "./components/SEO";
+import Reviews from "./components/Reviews";
 
 type Toast = { id: number; message: string };
 
@@ -221,12 +229,16 @@ function AppInner() {
   };
 
   const renderPage = () => {
-    if (path === "/") return <Home ctx={sharedContext} />;
-    if (path === "/shop") return <Shop ctx={sharedContext} openFaq={openFaq} setOpenFaq={setOpenFaq} />;
-    if (path === "/story") return <Story ctx={sharedContext} openFaq={openFaq} setOpenFaq={setOpenFaq} />;
-    if (path.startsWith("/journal/")) return <JournalArticle slug={path.replace("/journal/", "")} ctx={sharedContext} />;
-    if (path === "/journal") return <Journal />;
-    return <Home ctx={sharedContext} />;
+    if (path === "/") return <><SEO title="Ghanaian Shea Butter Skincare" description="Shea Tales — raw, unrefined shea butter from women-led cooperatives in Ghana. Soap, lotion, lip balm, and raw butter. Shop the ritual." path="/" /><Home ctx={sharedContext} /></>;
+    if (path === "/shop") return <><SEO title="Shop the Ritual" description="Four products built around raw Ghanaian shea butter. Cleanse, soften, seal — the complete skin ritual." path="/shop" /><Shop ctx={sharedContext} openFaq={openFaq} setOpenFaq={setOpenFaq} /></>;
+    if (path === "/story") return <><SEO title="Our Story" description="Selina founded Shea Tales to connect Ghanaian women's cooperative shea butter directly with the world. The source, the craft, the mission." path="/story" /><Story ctx={sharedContext} openFaq={openFaq} setOpenFaq={setOpenFaq} /></>;
+    if (path === "/journal") return <><SEO title="Shea Journal" description="Ingredient notes, ritual guides, and sourcing stories from the world of Shea Tales." path="/journal" /><Journal /></>;
+    if (path.startsWith("/journal/")) { const slug = path.replace("/journal/", ""); return <><SEO title="Journal" description="Shea Tales journal — ingredient notes and ritual guides." path={path} /><JournalArticle slug={slug} ctx={sharedContext} /></>; }
+    if (path === "/shipping") return <><SEO title="Shipping Information" description="Shea Tales ships worldwide. Processing times, delivery estimates, free shipping threshold, and customs information." path="/shipping" /><Shipping /></>;
+    if (path === "/returns") return <><SEO title="Returns & Refunds" description="30-day returns on unopened products. Damaged arrivals replaced immediately. Shea Tales stands behind every product." path="/returns" /><Returns /></>;
+    if (path === "/care") return <><SEO title="Care Instructions" description="How to get the most from your Shea Tales ritual — storage, application, and shelf life for every product." path="/care" /><Care /></>;
+    if (path.startsWith("/orders/")) { const id = path.replace("/orders/", ""); return <><SEO title={`Order #${id}`} description="Track your Shea Tales order." path={path} /><OrderTracking orderId={id} /></>; }
+    return <><SEO title="Ghanaian Shea Butter Skincare" description="Shea Tales — raw shea butter from Ghana." path="/" /><Home ctx={sharedContext} /></>;
   };
 
   if (path === "/admin") return <Admin />;
@@ -389,6 +401,7 @@ function AppInner() {
                   <Share2 size={16} /> Share
                 </button>
               </div>
+              <Reviews productId={selectedProduct.id} />
             </div>
           </>
         )}
@@ -491,6 +504,9 @@ function AppInner() {
       {/* Page content */}
       <main className="main">{renderPage()}</main>
 
+      <WhatsAppButton />
+      <CookieBanner />
+
       {/* Footer */}
       <footer id="footer">
         <div className="footer-top">
@@ -536,7 +552,9 @@ function AppInner() {
             <h4 className="footer-col-second-head">Help</h4>
             <ul>
               <li><Link to="/story">FAQ</Link></li>
-              <li><Link to="/story">Shipping info</Link></li>
+              <li><Link to="/shipping">Shipping Info</Link></li>
+              <li><Link to="/returns">Returns</Link></li>
+              <li><Link to="/care">Care Instructions</Link></li>
             </ul>
           </div>
         </div>

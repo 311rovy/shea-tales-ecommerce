@@ -31,23 +31,24 @@ export default function Story({ ctx: _ctx, openFaq, setOpenFaq }: Props) {
             <Picture src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Founder story" width={600} height={400} />
           </div>
           <div className="founder-copy reveal">
-            <p className="eyebrow">The Founder</p>
-            <h2>From Observation to Origin</h2>
+            <p className="eyebrow">Selina — Founder</p>
+            <h2>She Watched. Then She Built.</h2>
             <p>
-              Shea Tales began not with a formula, but with a question. After years of watching the skincare
-              industry chase trends while ignoring craft, I wanted to build something different. Something rooted.
+              Selina started Shea Tales after years of watching women in Ghana's northern communities spend
+              entire mornings processing shea butter by hand — cracking, roasting, kneading — producing
+              something extraordinary that the world had no idea about.
             </p>
             <p>
-              The answer was in Ghana. In the hands of women who know shea butter not as a trendy ingredient,
-              but as a way of life. Every bar, every jar, every balm carries the story of their patience,
-              their knowledge, and their hands.
+              Meanwhile, beauty shops sold moisturisers with "shea butter" buried at the bottom of a
+              twenty-ingredient list. Refined. Processed. Stripped of the very compounds that made it
+              remarkable. Marketed at a premium because of a single word.
             </p>
             <p>
-              This brand is my promise to honor that. To never shortcut the process. To keep ingredients simple.
-              To let the texture speak. To build a business where the quality behind the product matters as much
-              as the marketing around it.
+              Shea Tales exists to close that gap. To bring the real thing — raw, cooperative-sourced,
+              hand-processed Ghanaian shea butter — directly to people who deserve to experience it.
+              And to ensure the women whose craft makes it possible are paid fairly and seen clearly.
             </p>
-            <span className="founder-sig">— Founder, Shea Tales</span>
+            <span className="founder-sig">— Selina, Founder of Shea Tales</span>
           </div>
         </div>
       </section>
