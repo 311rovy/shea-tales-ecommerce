@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight, Check, Menu, Minus, Plus,
   RotateCcw, Search, Share2, ShieldCheck, ShoppingBag,
-  Truck, X,
+  Truck, User, X,
 } from "lucide-react";
+import { SignInButton, UserButton, useUser, useAuth } from "@clerk/clerk-react";
 import { Link, Router, useRouter } from "./router";
 import { menuLinks, products, quizOptions } from "./data";
 import type { AppOutletContext, CartItem, Product } from "./types";
@@ -16,6 +17,7 @@ import Shipping from "./pages/Shipping";
 import Returns from "./pages/Returns";
 import Care from "./pages/Care";
 import OrderTracking from "./pages/OrderTracking";
+import Account from "./pages/Account";
 import Admin from "./pages/Admin";
 import Picture from "./components/Picture";
 import WhatsAppButton from "./components/WhatsAppButton";
@@ -27,9 +29,13 @@ type Toast = { id: number; message: string };
 
 function AppInner() {
   const { path, navigate: _navigate } = useRouter();
+  const { user } = useUser();
+  const { getToken } = useAuth();
 
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("shea-wishlist") ?? "[]"); } catch { return []; }
+  });
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,6 +57,22 @@ function AppInner() {
   const emailRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const addressRef = useRef<HTMLTextAreaElement>(null);
+
+  // Persist wishlist per user
+  useEffect(() => {
+    const key = user ? `shea-wishlist-${user.id}` : "shea-wishlist";
+    localStorage.setItem(key, JSON.stringify(wishlist));
+  }, [wishlist, user]);
+
+  // Load user-specific wishlist when they sign in
+  useEffect(() => {
+    if (!user) return;
+    const key = `shea-wishlist-${user.id}`;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) ?? "[]");
+      if (Array.isArray(saved) && saved.length > 0) setWishlist(saved);
+    } catch {}
+  }, [user?.id]);
 
   const isHome = path === "/";
 
@@ -238,6 +260,7 @@ function AppInner() {
     if (path === "/returns") return <><SEO title="Returns & Refunds" description="30-day returns on unopened products. Damaged arrivals replaced immediately. Shea Tales stands behind every product." path="/returns" /><Returns /></>;
     if (path === "/care") return <><SEO title="Care Instructions" description="How to get the most from your Shea Tales ritual — storage, application, and shelf life for every product." path="/care" /><Care /></>;
     if (path.startsWith("/orders/")) { const id = path.replace("/orders/", ""); return <><SEO title={`Order #${id}`} description="Track your Shea Tales order." path={path} /><OrderTracking orderId={id} /></>; }
+    if (path === "/account") return <><SEO title="My Account" description="Your Shea Tales account — order history, wishlist, and profile." path="/account" /><Account wishlist={wishlist} toggleWishlist={toggleWishlist} addToCart={addToCart} /></>;
     return <><SEO title="Ghanaian Shea Butter Skincare" description="Shea Tales — raw shea butter from Ghana." path="/" /><Home ctx={sharedContext} /></>;
   };
 
@@ -495,10 +518,21 @@ function AppInner() {
           <Link to="/journal" className={path.startsWith("/journal") ? "nav-active" : ""}>Journal</Link>
           <button onClick={() => setQuizOpen(true)} className="nav-quiz-btn">Find My Ritual</button>
         </div>
-        <button className="cart-toggle" onClick={() => setCartOpen(true)}>
-          <ShoppingBag size={20} />
-          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-        </button>
+        <div className="nav-right">
+          {user ? (
+            <Link to="/account" className="nav-account-btn" aria-label="My account">
+              <UserButton afterSignOutUrl="/" />
+            </Link>
+          ) : (
+            <SignInButton mode="modal">
+              <button className="nav-signin-btn"><User size={18} /> Sign in</button>
+            </SignInButton>
+          )}
+          <button className="cart-toggle" onClick={() => setCartOpen(true)}>
+            <ShoppingBag size={20} />
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+          </button>
+        </div>
       </nav>
 
       {/* Page content */}

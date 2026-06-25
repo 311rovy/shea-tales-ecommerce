@@ -3925,3 +3925,211 @@ picture.pic-wrap {
 .stars { display: flex; gap: 2px; }
 .star { color: #ddd; fill: none; }
 .star.filled { color: #c8952a; fill: #c8952a; }
+
+/* ── Nav auth buttons ─────────────────────────────────── */
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+.nav-signin-btn {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1.5px solid currentColor;
+  padding: 0.45rem 1.1rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.nav-signin-btn:hover { background: #111; color: #fff; border-color: #111; }
+.nav-right .cl-userButtonTrigger { width: 34px; height: 34px; }
+
+/* ── Account gate (signed-out state) ─────────────────── */
+.account-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  min-height: 60vh;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  color: #555;
+}
+.account-gate h2 { font-size: clamp(1.4rem, 3vw, 2rem); color: #111; margin: 0; }
+.account-gate p { max-width: 36ch; margin: 0; }
+
+/* ── Account hero ─────────────────────────────────────── */
+.account-hero {
+  padding: 5rem 2rem 3rem;
+  background: #faf7f3;
+  border-bottom: 1px solid #ece7df;
+}
+.account-hero-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+}
+.account-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ece7df;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.account-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.account-hero-inner h1 { font-size: clamp(1.4rem, 3vw, 2rem); margin: 0.2rem 0 0; }
+.account-email { font-size: 0.86rem; color: #888; margin: 0; }
+.account-signout {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  background: none;
+  border: 1.5px solid #ccc;
+  padding: 0.55rem 1.1rem;
+  border-radius: 2px;
+  cursor: pointer;
+  color: #555;
+  transition: border-color 0.2s, color 0.2s;
+}
+.account-signout:hover { border-color: #111; color: #111; }
+
+/* ── Account body & tabs ──────────────────────────────── */
+.account-body { max-width: 860px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+.account-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1.5px solid #ece7df;
+  padding-bottom: 0;
+}
+.account-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  padding: 0.7rem 1.4rem;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  color: #888;
+  margin-bottom: -1.5px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.account-tab:hover { color: #111; }
+.account-tab.active { color: #111; border-bottom-color: #111; }
+.account-section { animation: fadeUp 0.4s ease both; }
+.account-loading { color: #888; font-size: 0.9rem; padding: 2rem 0; }
+
+/* Empty state */
+.account-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1.5rem;
+  color: #888;
+  text-align: center;
+}
+.account-empty p { font-size: 0.95rem; margin: 0; }
+
+/* ── Order cards ──────────────────────────────────────── */
+.account-orders { display: flex; flex-direction: column; gap: 1.4rem; }
+.account-order-card {
+  border: 1.5px solid #ece7df;
+  border-radius: 6px;
+  padding: 1.4rem 1.6rem;
+  background: #fff;
+}
+.account-order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.account-order-id { font-weight: 700; font-size: 0.95rem; margin: 0; }
+.account-order-date { font-size: 0.8rem; color: #aaa; margin: 0.2rem 0 0; }
+.account-order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; }
+.account-order-status { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.account-order-total { font-size: 1.05rem; }
+.account-order-items { font-size: 0.84rem; color: #666; margin-bottom: 1rem; line-height: 1.8; }
+.account-track-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #111;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: opacity 0.2s;
+}
+.account-track-link:hover { opacity: 0.6; }
+
+/* ── Wishlist cards ───────────────────────────────────── */
+.account-wishlist { display: flex; flex-direction: column; gap: 1.2rem; }
+.account-wishlist-card {
+  display: flex;
+  gap: 1.4rem;
+  border: 1.5px solid #ece7df;
+  border-radius: 6px;
+  padding: 1.2rem;
+  background: #fff;
+  align-items: center;
+}
+.account-wishlist-card picture,
+.account-wishlist-card img {
+  width: 90px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.account-wishlist-info { flex: 1; min-width: 0; }
+.account-wishlist-info h3 { font-size: 1rem; margin: 0.2rem 0 0.4rem; }
+.account-wishlist-info strong { font-size: 1rem; display: block; margin-bottom: 0.8rem; }
+.account-wishlist-actions { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+.account-remove-btn {
+  background: none;
+  border: 1.5px solid #ccc;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  border-radius: 2px;
+  color: #888;
+  transition: border-color 0.2s, color 0.2s;
+}
+.account-remove-btn:hover { border-color: #c0392b; color: #c0392b; }
+
+@media (max-width: 480px) {
+  .account-hero-inner { flex-direction: column; align-items: flex-start; }
+  .account-signout { margin-left: 0; }
+  .account-wishlist-card { flex-direction: column; align-items: flex-start; }
+  .account-wishlist-card picture,
+  .account-wishlist-card img { width: 100%; height: 200px; }
+}
