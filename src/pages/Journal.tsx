@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "../router";
 import { journalPosts } from "../data";
+import Picture from "../components/Picture";
 
 const categories = ["All", "Ingredient Notes", "Ritual", "Source"];
 
@@ -49,7 +50,7 @@ export default function Journal() {
               style={{ transitionDelay: `${index * 110}ms` }}
               key={post.slug}
             >
-              <img src={post.image} alt={post.title} />
+              <Picture src={post.image} alt={post.title} width={600} height={400} />
               <div>
                 <div className="journal-card-meta">
                   <span>{post.category}</span>

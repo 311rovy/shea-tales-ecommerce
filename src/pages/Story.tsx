@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { Link } from "../router";
 import { brandValues, communityStories, faqs } from "../data";
 import type { AppOutletContext } from "../types";
+import Picture from "../components/Picture";
 
 type Props = {
   ctx: AppOutletContext;
@@ -14,7 +15,7 @@ export default function Story({ ctx: _ctx, openFaq, setOpenFaq }: Props) {
     <div className="page-fade">
       {/* Interior page hero */}
       <section className="interior-hero interior-hero--dark">
-        <img src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Shea Tales story" className="interior-hero-bg" />
+        <Picture src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Shea Tales story" className="interior-hero-bg" width={1536} height={1024} priority />
         <div className="interior-hero-scrim" />
         <div className="interior-hero-content reveal">
           <p className="eyebrow">Our Story</p>
@@ -27,7 +28,7 @@ export default function Story({ ctx: _ctx, openFaq, setOpenFaq }: Props) {
       <section id="about-founder" className="founder-section">
         <div className="founder-grid">
           <div className="founder-media reveal">
-            <img src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Founder story" />
+            <Picture src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Founder story" width={600} height={400} />
           </div>
           <div className="founder-copy reveal">
             <p className="eyebrow">The Founder</p>
@@ -59,7 +60,7 @@ export default function Story({ ctx: _ctx, openFaq, setOpenFaq }: Props) {
             <h2>Not clean beauty as a trend. Care as a memory.</h2>
           </div>
           <div className="manifesto-media reveal">
-            <img src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Morning shea butter ritual" />
+            <Picture src="/Template-1/assets/brand-lifestyle-ritual.png" alt="Morning shea butter ritual" width={600} height={400} />
           </div>
         </div>
         <div className="manifesto-lines">
@@ -77,7 +78,7 @@ export default function Story({ ctx: _ctx, openFaq, setOpenFaq }: Props) {
       {/* Source */}
       <section id="source" className="source-section">
         <div className="source-media reveal">
-          <img src="/Template-1/assets/brand-shea-source.png" alt="Hands working with raw shea butter" />
+          <Picture src="/Template-1/assets/brand-shea-source.png" alt="Hands working with raw shea butter" width={600} height={400} />
           <video autoPlay loop muted playsInline src="/Template-1/assets/video2.mp4" />
         </div>
         <div className="source-copy reveal">

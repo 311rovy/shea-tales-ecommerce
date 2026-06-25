@@ -13,6 +13,7 @@ import Story from "./pages/Story";
 import Journal from "./pages/Journal";
 import JournalArticle from "./pages/JournalArticle";
 import Admin from "./pages/Admin";
+import Picture from "./components/Picture";
 
 type Toast = { id: number; message: string };
 
@@ -283,7 +284,7 @@ function AppInner() {
 
       {/* Cinematic fullscreen menu */}
       <aside className={`cinematic-menu ${menuOpen ? "active" : ""}`} aria-label="Fullscreen menu">
-        <img src={activeMenuImage} alt="" />
+        <Picture src={activeMenuImage} alt="" width={1536} height={1024} />
         <div className="menu-scrim" />
         <div className="cinematic-top">
           <Link to="/" onClick={() => setMenuOpen(false)} className="cinematic-brand">Shea Tales</Link>
@@ -320,7 +321,7 @@ function AppInner() {
           ) : (
             cart.map((item) => (
               <div className="cart-item" key={item.id}>
-                <img src={item.image} alt={item.name} />
+                <Picture src={item.image} alt={item.name} width={500} height={625} />
                 <div className="cart-item-info">
                   <h4>{item.name}</h4>
                   <p>${item.price.toFixed(2)} / {item.size}</p>
@@ -355,7 +356,7 @@ function AppInner() {
           <>
             <button className="drawer-close" onClick={() => setSelectedProduct(null)} aria-label="Close"><X size={28} /></button>
             <div className="drawer-media">
-              <img src={selectedProduct.image} alt={selectedProduct.name} />
+              <Picture src={selectedProduct.image} alt={selectedProduct.name} width={500} height={625} />
               <video autoPlay muted loop playsInline src={selectedProduct.video} />
             </div>
             <div className="drawer-copy">
@@ -445,7 +446,7 @@ function AppInner() {
           <div className="quiz-result">
             {selectedQuiz.result === "bundle" ? (
               <>
-                <img src="/Template-1/assets/brand-ritual-textures.png" alt="Complete ritual" />
+                <Picture src="/Template-1/assets/brand-ritual-textures.png" alt="Complete ritual" width={400} height={600} />
                 <div>
                   <span>Recommended</span>
                   <h3>Complete Ritual Set</h3>
@@ -455,7 +456,7 @@ function AppInner() {
               </>
             ) : quizProduct ? (
               <>
-                <img src={quizProduct.image} alt={quizProduct.name} />
+                <Picture src={quizProduct.image} alt={quizProduct.name} width={500} height={625} />
                 <div>
                   <span>Recommended</span>
                   <h3>{quizProduct.name}</h3>
@@ -471,7 +472,7 @@ function AppInner() {
       {/* Fixed nav */}
       <nav className={`app-nav ${navSolid ? "nav-solid" : "nav-transparent"}`}>
         <Link to="/" className="brand">
-          <img src="/Template-1/assets/Logosheatales.jpeg" alt="Shea Tales logo" className="logo-img" />
+          <Picture src="/Template-1/assets/Logosheatales.jpeg" alt="Shea Tales logo" className="logo-img" width={40} height={41} priority />
           Shea Tales
         </Link>
         <div className="nav-links" aria-label="Primary navigation">
@@ -494,7 +495,7 @@ function AppInner() {
       <footer id="footer">
         <div className="footer-top">
           <div className="footer-brand">
-            <img src="/Template-1/assets/Logosheatales.jpeg" alt="Shea Tales logo" className="footer-logo" />
+            <Picture src="/Template-1/assets/Logosheatales.jpeg" alt="Shea Tales logo" className="footer-logo" width={60} height={62} />
             <p className="footer-tagline">Daily skin rituals shaped<br />by Ghanaian shea butter.</p>
             <form className="footer-newsletter-form" onSubmit={(e) => e.preventDefault()}>
               <input type="email" placeholder="Join the ritual drop..." aria-label="Email for newsletter" />

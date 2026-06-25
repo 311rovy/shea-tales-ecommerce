@@ -2,6 +2,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "../router";
 import { galleryImages, products, rawShea, ritualSteps } from "../data";
 import type { AppOutletContext } from "../types";
+import Picture from "../components/Picture";
 
 type Props = { ctx: AppOutletContext };
 
@@ -69,7 +70,7 @@ export default function Home({ ctx }: Props) {
               style={{ transitionDelay: `${index * 120}ms` }}
               key={step.title}
             >
-              <img src={step.image} alt={`${step.title} ritual step`} />
+              <Picture src={step.image} alt={`${step.title} ritual step`} width={500} height={625} />
               <span>0{index + 1}</span>
               <h3>{step.title}</h3>
               <p>{step.copy}</p>
@@ -112,7 +113,7 @@ export default function Home({ ctx }: Props) {
         <div className="swipper">
           <div className="swiper-slide">
             {[...galleryImages, ...galleryImages].map((image, index) => (
-              <img src={image} alt="Shea Tales brand and product story" key={`${image}-${index}`} />
+              <Picture src={image} alt="Shea Tales brand and product story" key={`${image}-${index}`} width={600} height={400} />
             ))}
           </div>
         </div>
@@ -128,7 +129,7 @@ export default function Home({ ctx }: Props) {
         <div className="instagram-grid reveal">
           {instagramImages.map((src, i) => (
             <div className="instagram-cell" key={i}>
-              <img src={src} alt={`Shea Tales on Instagram ${i + 1}`} loading="lazy" />
+              <Picture src={src} alt={`Shea Tales on Instagram ${i + 1}`} width={400} height={400} />
               <div className="instagram-hover">
                 <Sparkles size={20} />
               </div>

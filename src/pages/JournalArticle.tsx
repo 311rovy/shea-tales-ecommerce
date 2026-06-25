@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight, Share2 } from "lucide-react";
 import { Link } from "../router";
 import { journalPosts, products, rawShea } from "../data";
 import type { AppOutletContext } from "../types";
+import Picture from "../components/Picture";
 
 type Props = { slug: string; ctx: AppOutletContext };
 
@@ -37,7 +38,7 @@ export default function JournalArticle({ slug, ctx }: Props) {
     <div className="page-fade">
       {/* Article hero */}
       <section className="article-hero">
-        <img src={post.image} alt={post.title} />
+        <Picture src={post.image} alt={post.title} width={1536} height={1024} priority />
         <div className="article-hero-scrim" />
         <div className="article-hero-content">
           <div className="article-meta">
@@ -82,7 +83,7 @@ export default function JournalArticle({ slug, ctx }: Props) {
         <section className="article-related">
           <p className="eyebrow">Referenced in this note</p>
           <div className="article-related-card">
-            <img src={relatedProduct.image} alt={relatedProduct.name} />
+            <Picture src={relatedProduct.image} alt={relatedProduct.name} width={500} height={625} />
             <div>
               <span>{relatedProduct.step}</span>
               <h3>{relatedProduct.name}</h3>
@@ -105,7 +106,7 @@ export default function JournalArticle({ slug, ctx }: Props) {
             .slice(0, 2)
             .map((p) => (
               <Link to={`/journal/${p.slug}`} key={p.slug} className="article-other-card">
-                <img src={p.image} alt={p.title} />
+                <Picture src={p.image} alt={p.title} width={600} height={400} />
                 <div>
                   <span>{p.category} · {p.readTime}</span>
                   <h4>{p.title}</h4>

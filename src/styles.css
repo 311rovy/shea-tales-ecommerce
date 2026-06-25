@@ -205,7 +205,7 @@ textarea {
   transform: translateY(0);
 }
 
-.cinematic-menu > img,
+.cinematic-menu > picture > img,
 .menu-scrim {
   position: absolute;
   inset: 0;
@@ -213,7 +213,7 @@ textarea {
   height: 100%;
 }
 
-.cinematic-menu > img {
+.cinematic-menu > picture > img {
   z-index: -2;
   object-fit: cover;
   transition: opacity 0.45s ease;
@@ -2366,7 +2366,7 @@ nav {
 
 .bundle-copy button:hover { background: #fff; color: #111; }
 
-.bundle-section > img { width: 100%; height: 100%; object-fit: cover; opacity: 0.72; }
+.bundle-section > picture > img { width: 100%; height: 100%; object-fit: cover; opacity: 0.72; }
 
 /* ========== FOUNDER ========== */
 .founder-section {
@@ -3737,4 +3737,16 @@ textarea:focus {
 
 .admin-status-select:focus {
   border-color: #9d7428;
+}
+
+/* ── Optimized images: WebP + fade-in placeholder ── */
+picture.pic-wrap {
+  display: contents;
+}
+.pic-wrap img {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.pic-wrap.pic-loaded img {
+  opacity: 1;
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight, Heart, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
 import { products, rawShea } from "../data";
 import type { AppOutletContext } from "../types";
+import Picture from "../components/Picture";
 
 type Props = {
   ctx: AppOutletContext;
@@ -85,7 +86,7 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
                   <button onClick={() => setSelectedProduct(product)}>View Ritual</button>
                 </div>
               </div>
-              <img src={product.image} alt={product.name} />
+              <Picture src={product.image} alt={product.name} width={500} height={625} />
               <video autoPlay loop muted playsInline preload="metadata" src={product.video} />
             </article>
           ))}
@@ -100,7 +101,7 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
           <p>All three steps together — the full shea ritual at one price.</p>
           <button onClick={addBundle}>Add Complete Ritual — $61.97 <ArrowRight size={16} /></button>
         </div>
-        <img src="/Template-1/assets/brand-ritual-textures.png" alt="Complete Shea Tales ritual" />
+        <Picture src="/Template-1/assets/brand-ritual-textures.png" alt="Complete Shea Tales ritual" width={400} height={600} />
       </section>
 
       {/* Texture section */}
@@ -114,7 +115,7 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
           </p>
         </div>
         <div className="texture-media reveal">
-          <img src="/Template-1/assets/brand-ritual-textures.png" alt="Shea butter textures" />
+          <Picture src="/Template-1/assets/brand-ritual-textures.png" alt="Shea butter textures" width={400} height={600} />
         </div>
       </section>
 
