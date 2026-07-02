@@ -5,8 +5,12 @@ import {
   Truck, User, X,
 } from "lucide-react";
 import { SignInButton, UserButton, useUser, useAuth } from "@clerk/clerk-react";
+import Lenis from "lenis";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link, Router, useRouter } from "./router";
 import { menuLinks, products, quizOptions } from "./data";
+import { formatPrice, shippingFor, FREE_SHIPPING_THRESHOLD } from "./currency";
 import type { AppOutletContext, CartItem, Product } from "./types";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -49,6 +53,7 @@ function AppInner() {
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [emailValue, setEmailValue] = useState("");
   const [navSolid, setNavSolid] = useState(false);
+  const [intro, setIntro] = useState(true);
   const [openFaq, setOpenFaq] = useState(-1);
   const [stockMap, setStockMap] = useState<Record<string, number>>({});
   const [orderError, setOrderError] = useState("");
@@ -57,6 +62,7 @@ function AppInner() {
   const emailRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const addressRef = useRef<HTMLTextAreaElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
 
   // Persist wishlist per user
   useEffect(() => {
@@ -92,6 +98,53 @@ function AppInner() {
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
+
+  // Smooth scroll (Lenis) synced with GSAP's ticker — one RAF loop, not two.
+  // Skipped entirely for users who prefer reduced motion.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    const lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5,
+    });
+    lenisRef.current = lenis;
+
+    lenis.on("scroll", ScrollTrigger.update);
+    const raf = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(raf);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      gsap.ticker.remove(raf);
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
+
+  // On route change, jump to top through Lenis and recalc scroll triggers.
+  useEffect(() => {
+    lenisRef.current?.scrollTo(0, { immediate: true });
+    ScrollTrigger.refresh();
+  }, [path]);
+
+  // Dismiss the intro loader after its wordmark + wipe animation finishes.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setIntro(false); return; }
+    const t = setTimeout(() => setIntro(false), 2200);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Freeze background scroll while the intro plays or any drawer/menu is open.
+  const scrollLocked = intro || cartOpen || checkoutOpen || quizOpen || menuOpen || !!selectedProduct;
+  useEffect(() => {
+    const lenis = lenisRef.current;
+    if (lenis) { scrollLocked ? lenis.stop() : lenis.start(); }
+    else { document.body.style.overflow = scrollLocked ? "hidden" : ""; }
+  }, [scrollLocked]);
 
   useEffect(() => {
     const dismissed = localStorage.getItem("shea-email-popup");
@@ -167,16 +220,9 @@ function AppInner() {
     setCheckoutOpen(true);
   };
 
-  const placeOrder = async () => {
-    if (cart.length === 0) return;
-    const email = emailRef.current?.value.trim() ?? "";
-    const name = nameRef.current?.value.trim() ?? "";
-    const address = addressRef.current?.value.trim() ?? "";
-    if (!email || !name) {
-      setOrderError("Please fill in your email and name.");
-      return;
-    }
-    setOrderError("");
+  // After a successful Paystack payment we send the payment reference to the
+  // server, which verifies it with Paystack before creating the order.
+  const submitOrder = async (paymentRef: string, email: string, name: string, address: string) => {
     setOrderLoading(true);
     try {
       const res = await fetch("/api/orders", {
@@ -186,12 +232,13 @@ function AppInner() {
           email,
           name,
           address,
+          reference: paymentRef,
           cart: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.quantity })),
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setOrderError(data.error ?? "Something went wrong. Please try again.");
+        setOrderError(data.error ?? "Payment received, but we couldn't confirm your order. Please contact us with your reference: " + paymentRef);
         return;
       }
       setOrderId(data.orderId);
@@ -207,10 +254,57 @@ function AppInner() {
         })
         .catch(() => {});
     } catch {
-      setOrderError("Connection error. Please try again.");
+      setOrderError("Payment received, but we couldn't reach the server. Please contact us with your reference: " + paymentRef);
     } finally {
       setOrderLoading(false);
     }
+  };
+
+  const placeOrder = () => {
+    if (cart.length === 0) return;
+    const email = emailRef.current?.value.trim() ?? "";
+    const name = nameRef.current?.value.trim() ?? "";
+    const address = addressRef.current?.value.trim() ?? "";
+    if (!email || !name) {
+      setOrderError("Please fill in your email and name.");
+      return;
+    }
+
+    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+    if (!publicKey || publicKey.includes("your_public_key")) {
+      setOrderError("Payment is not configured yet. Add your Paystack public key to continue.");
+      return;
+    }
+    if (typeof PaystackPop === "undefined") {
+      setOrderError("Payment could not load. Check your connection and try again.");
+      return;
+    }
+
+    setOrderError("");
+    // Paystack expects the amount in the currency's subunit — for KES that's cents.
+    const handler = PaystackPop.setup({
+      key: publicKey,
+      email,
+      amount: Math.round(total * 100),
+      currency: "KES",
+      ref: `shea_${Date.now()}`,
+      channels: ["card", "mobile_money"],
+      // Stashed so the webhook can rebuild the order if this browser never
+      // reaches submitOrder (see api/payment-webhook.js).
+      metadata: {
+        customer_name: name,
+        address,
+        cart: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.quantity })),
+      },
+      callback: (response) => {
+        // Paystack callback is not async-aware; kick off our own async submit.
+        void submitOrder(response.reference, email, name, address);
+      },
+      onClose: () => {
+        pushToast("Payment cancelled");
+      },
+    });
+    handler.openIframe();
   };
 
   const handleShare = async (product: Product) => {
@@ -237,7 +331,7 @@ function AppInner() {
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.quantity * item.price, 0), [cart]);
-  const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 6.95;
+  const shipping = shippingFor(subtotal);
   const total = subtotal + shipping;
 
   const selectedQuiz = quizOptions.find((o) => o.id === quizChoice) ?? quizOptions[0];
@@ -268,7 +362,19 @@ function AppInner() {
 
   return (
     <>
-      <div className="cursor"><h1>Feel</h1></div>
+      {/* Intro loader — brand wordmark rises, then the panel wipes up */}
+      {intro && (
+        <div className="intro-loader" aria-hidden="true">
+          <div className="intro-inner">
+            <span className="line-mask"><span className="intro-eyebrow">Ghanaian Shea Butter</span></span>
+            <span className="line-mask"><h1 className="intro-word">Shea Tales</h1></span>
+          </div>
+        </div>
+      )}
+
+      {/* Adaptive custom cursor (fine-pointer devices only, via CSS) */}
+      <div className="cursor-ring" aria-hidden="true" />
+      <div className="cursor-dot" aria-hidden="true" />
 
       {/* Toast notifications */}
       <div className="toast-stack" aria-live="polite">
@@ -359,7 +465,7 @@ function AppInner() {
                 <Picture src={item.image} alt={item.name} width={500} height={625} />
                 <div className="cart-item-info">
                   <h4>{item.name}</h4>
-                  <p>${item.price.toFixed(2)} / {item.size}</p>
+                  <p>{formatPrice(item.price)} / {item.size}</p>
                   <div className="qty">
                     <button onClick={() => updateQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity"><Minus size={14} /></button>
                     <span>{item.quantity}</span>
@@ -375,12 +481,12 @@ function AppInner() {
             Ritual code
             <input type="text" placeholder="e.g. SHEA10" />
           </label>
-          <div className="cart-line"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-          <div className="cart-line"><span>Shipping</span><span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span></div>
-          {subtotal > 0 && subtotal < 50 && (
-            <p className="shipping-nudge">Add ${(50 - subtotal).toFixed(2)} more for free shipping</p>
+          <div className="cart-line"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+          <div className="cart-line"><span>Shipping</span><span>{shipping === 0 ? "Free" : formatPrice(shipping)}</span></div>
+          {subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD && (
+            <p className="shipping-nudge">Add {formatPrice(FREE_SHIPPING_THRESHOLD - subtotal)} more for free shipping</p>
           )}
-          <div className="cart-total"><span>Total</span><span>${total.toFixed(2)}</span></div>
+          <div className="cart-total"><span>Total</span><span>{formatPrice(total)}</span></div>
           <button className="checkout-btn" disabled={cart.length === 0} onClick={openCheckout}>Checkout</button>
         </div>
       </aside>
@@ -397,7 +503,7 @@ function AppInner() {
             <div className="drawer-copy">
               <p className="eyebrow">{selectedProduct.step} / {selectedProduct.size}</p>
               <h2>{selectedProduct.name}</h2>
-              <strong>${selectedProduct.price.toFixed(2)}</strong>
+              <strong>{formatPrice(selectedProduct.price)}</strong>
               <p>{selectedProduct.details}</p>
               <div className="product-specs">
                 <span>Skin: {selectedProduct.skinType}</span>
@@ -449,15 +555,15 @@ function AppInner() {
             <label>Email<input ref={emailRef} type="email" placeholder="you@example.com" required /></label>
             <label>Full name<input ref={nameRef} type="text" placeholder="Your name" required /></label>
             <label>Shipping address<textarea ref={addressRef} placeholder="Street, city, region, country" /></label>
-            <label>Card number<input type="text" placeholder="&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull;" maxLength={19} /></label>
+            <p className="checkout-pay-note">You'll pay securely with card or M-Pesa via Paystack in the next step.</p>
             {orderError && <p style={{ color: "#c0392b", fontSize: "0.82rem", margin: "0.25rem 0" }}>{orderError}</p>}
             <div className="trust-row">
               <span><Truck size={18} /> 2-3 day processing</span>
               <span><ShieldCheck size={18} /> Secure checkout</span>
             </div>
-            <div className="cart-total"><span>Total</span><span>${total.toFixed(2)}</span></div>
+            <div className="cart-total"><span>Total</span><span>{formatPrice(total)}</span></div>
             <button type="button" className="checkout-btn" onClick={placeOrder} disabled={orderLoading}>
-              {orderLoading ? "Placing order…" : "Place Order"}
+              {orderLoading ? "Confirming order…" : `Pay ${formatPrice(total)}`}
             </button>
           </form>
         )}

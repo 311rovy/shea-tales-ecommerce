@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatPrice } from "../currency";
 
 type AdminProduct = {
   id: string;
@@ -196,7 +197,7 @@ export default function Admin() {
               <thead>
                 <tr>
                   <th>Product</th>
-                  <th>Price ($)</th>
+                  <th>Price (KSh)</th>
                   <th>Stock (qty)</th>
                   <th></th>
                 </tr>
@@ -212,7 +213,7 @@ export default function Admin() {
                       <td>
                         <input
                           type="number"
-                          step="0.01"
+                          step="1"
                           min="0"
                           className="admin-input"
                           value={edit.price ?? p.price}
@@ -306,7 +307,7 @@ export default function Admin() {
                             </span>
                           ))}
                         </td>
-                        <td>${Number(o.total).toFixed(2)}</td>
+                        <td>{formatPrice(Number(o.total))}</td>
                         <td className="admin-cell-sm">
                           {new Date(o.created_at).toLocaleDateString("en-GB", {
                             day: "numeric",

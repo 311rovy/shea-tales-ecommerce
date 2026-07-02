@@ -3,6 +3,7 @@ import { useUser, useClerk, useAuth } from "@clerk/clerk-react";
 import { Link } from "../router";
 import { ArrowLeft, ArrowRight, Heart, LogOut, Package, User } from "lucide-react";
 import { products as allProducts, rawShea } from "../data";
+import { formatPrice } from "../currency";
 import type { Product } from "../types";
 import Picture from "../components/Picture";
 
@@ -116,7 +117,7 @@ export default function Account({ wishlist, toggleWishlist, addToCart }: Props) 
                         <span className="account-order-status" style={{ color: STATUS_COLOR[order.status] ?? "#111" }}>
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
-                        <strong className="account-order-total">${Number(order.total).toFixed(2)}</strong>
+                        <strong className="account-order-total">{formatPrice(Number(order.total))}</strong>
                       </div>
                     </div>
                     <div className="account-order-items">
@@ -151,7 +152,7 @@ export default function Account({ wishlist, toggleWishlist, addToCart }: Props) 
                     <div className="account-wishlist-info">
                       <p className="eyebrow">{product.step}</p>
                       <h3>{product.name}</h3>
-                      <strong>${product.price.toFixed(2)}</strong>
+                      <strong>{formatPrice(product.price)}</strong>
                       <div className="account-wishlist-actions">
                         <button onClick={() => addToCart(product)} className="policy-btn">Add to Bag</button>
                         <button onClick={() => toggleWishlist(product.id)} className="account-remove-btn">Remove</button>

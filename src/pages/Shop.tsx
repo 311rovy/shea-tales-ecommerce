@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, Heart, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
 import { products, rawShea } from "../data";
+import { formatPrice } from "../currency";
 import type { AppOutletContext } from "../types";
 import Picture from "../components/Picture";
 
@@ -32,7 +33,7 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
 
       {/* Free shipping bar */}
       <div className="shipping-bar">
-        <Truck size={16} /> Free shipping on all orders over $50 &nbsp;·&nbsp; <span onClick={() => setQuizOpen(true)} style={{ cursor: "pointer", textDecoration: "underline" }}>Not sure where to start? Take the quiz</span>
+        <Truck size={16} /> Free shipping on all orders over KSh 5,000 &nbsp;·&nbsp; <span onClick={() => setQuizOpen(true)} style={{ cursor: "pointer", textDecoration: "underline" }}>Not sure where to start? Take the quiz</span>
       </div>
 
       {/* Shop tools */}
@@ -75,7 +76,7 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
                 <span>{product.step}</span>
                 <h1>{product.shortName}</h1>
                 <p className="product-story">{product.story}</p>
-                <p className="product-price">${product.price.toFixed(2)}</p>
+                <p className="product-price">{formatPrice(product.price)}</p>
                 <div className="product-actions">
                   <button
                     onClick={() => addToCart(product)}
@@ -99,7 +100,7 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
           <p className="eyebrow">Complete Ritual</p>
           <h2>Cleanse. Soften. Seal.</h2>
           <p>All three steps together — the full shea ritual at one price.</p>
-          <button onClick={addBundle}>Add Complete Ritual — $61.97 <ArrowRight size={16} /></button>
+          <button onClick={addBundle}>Add Complete Ritual — {formatPrice(products.reduce((sum, p) => sum + p.price, 0))} <ArrowRight size={16} /></button>
         </div>
         <Picture src="/Template-1/assets/brand-ritual-textures.png" alt="Complete Shea Tales ritual" width={400} height={600} />
       </section>
@@ -124,7 +125,7 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
         <article className="care-card reveal">
           <Truck size={26} />
           <h3>Shipping</h3>
-          <p>Orders leave in 2-3 business days. Shipping is free when the bag reaches $50.</p>
+          <p>Orders leave in 2-3 business days. Shipping is free when the bag reaches KSh 5,000.</p>
         </article>
         <article className="care-card reveal">
           <RotateCcw size={26} />
@@ -143,14 +144,16 @@ export default function Shop({ ctx, openFaq, setOpenFaq }: Props) {
         <div className="border" />
         <div className="elements">
           {[
-            "Free shipping on all orders over $50.",
+            "Free shipping on all orders over KSh 5,000.",
             "Raw shea butter leads every formula.",
             "Ethically sourced through women-led craft.",
             "No parabens. No sulfates. No noise.",
             "Small rituals, made for daily skin.",
             "This is Shea Tales.",
-          ].map((line) => (
-            <h1 className="line-reveal" key={line}>{line}</h1>
+          ].map((line, i) => (
+            <span className="line-mask" key={line}>
+              <h1 className="line-reveal" style={{ transitionDelay: `${i * 80}ms` }}>{line}</h1>
+            </span>
           ))}
         </div>
         <div className="head reveal">

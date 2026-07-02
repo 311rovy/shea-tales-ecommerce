@@ -70,8 +70,10 @@ export default function Story({ ctx: _ctx, openFaq, setOpenFaq }: Props) {
             "A raw, golden ingredient with a long memory.",
             "Made by hands that know patience.",
             "Used by skin that asks for softness.",
-          ].map((line) => (
-            <h1 className="line-reveal" key={line}>{line}</h1>
+          ].map((line, i) => (
+            <span className="line-mask" key={line}>
+              <h1 className="line-reveal" style={{ transitionDelay: `${i * 80}ms` }}>{line}</h1>
+            </span>
           ))}
         </div>
       </section>
@@ -156,7 +158,7 @@ export default function Story({ ctx: _ctx, openFaq, setOpenFaq }: Props) {
           <div className="stat-row">
             <span><strong>3</strong> Core ritual steps</span>
             <span><strong>0</strong> Sulfates or parabens</span>
-            <span><strong>$50+</strong> Free shipping</span>
+            <span><strong>KSh 5,000+</strong> Free shipping</span>
           </div>
         </div>
       </section>

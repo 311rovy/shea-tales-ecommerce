@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, Share2 } from "lucide-react";
 import { Link } from "../router";
 import { journalPosts, products, rawShea } from "../data";
+import { formatPrice } from "../currency";
 import type { AppOutletContext } from "../types";
 import Picture from "../components/Picture";
 
@@ -88,7 +89,7 @@ export default function JournalArticle({ slug, ctx }: Props) {
               <span>{relatedProduct.step}</span>
               <h3>{relatedProduct.name}</h3>
               <p>{relatedProduct.story}</p>
-              <p className="article-related-price">${relatedProduct.price.toFixed(2)}</p>
+              <p className="article-related-price">{formatPrice(relatedProduct.price)}</p>
               <button onClick={() => addToCart(relatedProduct)}>Add to Bag</button>
             </div>
           </div>

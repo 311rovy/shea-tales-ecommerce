@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "../router";
 import { ArrowLeft, Check, Clock, Package, Truck } from "lucide-react";
+import { formatPrice } from "../currency";
 
 type OrderItem = { name: string; qty: number; price: number };
 type Order = {
@@ -120,12 +121,12 @@ export default function OrderTracking({ orderId }: Props) {
               <div className="track-item" key={i}>
                 <span>{item.name}</span>
                 <span>×{item.qty}</span>
-                <span>${(item.price * item.qty).toFixed(2)}</span>
+                <span>{formatPrice(item.price * item.qty)}</span>
               </div>
             ))}
             <div className="track-total">
               <span>Total</span>
-              <span>${Number(order.total).toFixed(2)}</span>
+              <span>{formatPrice(Number(order.total))}</span>
             </div>
           </div>
 

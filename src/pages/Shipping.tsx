@@ -27,7 +27,7 @@ export default function Shipping() {
           <div className="policy-card">
             <Globe size={28} />
             <h3>Free Shipping</h3>
-            <p>Orders over <strong>$75</strong> qualify for free standard international shipping. This is applied automatically at checkout — no code needed.</p>
+            <p>Orders over <strong>KSh 5,000</strong> qualify for free standard shipping. This is applied automatically at checkout — no code needed.</p>
           </div>
           <div className="policy-card">
             <Package size={28} />
